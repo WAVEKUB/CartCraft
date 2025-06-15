@@ -3,6 +3,7 @@ package com.cart.cartcraft.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
@@ -15,8 +16,8 @@ public class Product {
     private Long id;
     private String name;
     private String brand;
-    private Double price;
-    private Integer quantity;
+    private BigDecimal price;
+    private int quantity;
     private String description;
 
     // Relationship
@@ -27,7 +28,7 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images;
 
-    public Product(String name, String brand, Double price, Integer quantity, String description, Category category) {
+    public Product(String name, String brand, BigDecimal price, int quantity, String description, Category category) {
         this.name = name;
         this.brand = brand;
         this.price = price;
