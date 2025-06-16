@@ -1,6 +1,7 @@
 package com.cart.cartcraft.service.cart;
 
 import com.cart.cartcraft.model.Cart;
+import com.cart.cartcraft.model.User;
 
 import java.math.BigDecimal;
 
@@ -9,5 +10,7 @@ public interface ICartService {
     void clearCart(Long id);
     BigDecimal getTotalPrice(Long id);
 
-    Long initializeNewCart();
+    Cart initializeNewCart(User user);
+
+    Cart getCartByUserId(Long userId);
 }
