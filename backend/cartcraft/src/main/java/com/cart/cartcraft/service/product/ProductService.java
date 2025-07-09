@@ -2,6 +2,7 @@ package com.cart.cartcraft.service.product;
 
 import com.cart.cartcraft.dto.ImageDto;
 import com.cart.cartcraft.dto.ProductDto;
+import com.cart.cartcraft.exception.AlreadyExistsException;
 import com.cart.cartcraft.exception.ResourceNotFoundException;
 import com.cart.cartcraft.model.Category;
 import com.cart.cartcraft.model.Image;
@@ -29,10 +30,9 @@ public class ProductService implements IProductService{
 
     @Override
     public Product addProduct(AddProductRequest request) {
-        // check if the category is found in DB
-        // if Yes, set it as new product category
-        // If No, the save it as a new category
-        // The set as the new product category
+        if (productExists(request.getName(), request.getBrand())) {
+            throw new AlreadyExistsException(request.getName() + " by " + request.getBrand() + " already exists! You can update it instead.");
+        }
 
         Category category = Optional.ofNullable(categoryRepository.findByName(request.getCategory().getName()))
                 .orElseGet(()->{
@@ -41,6 +41,10 @@ public class ProductService implements IProductService{
                 });
         request.setCategory(category);
         return productRepository.save(createProduct(request, category));
+    }
+
+    private boolean productExists(String name, String brand) {
+        return productRepository.existsByNameAndBrand(name, brand);
     }
 
     private Product createProduct(AddProductRequest request, Category category) {
