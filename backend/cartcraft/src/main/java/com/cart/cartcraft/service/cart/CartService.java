@@ -2,6 +2,7 @@ package com.cart.cartcraft.service.cart;
 
 import com.cart.cartcraft.exception.ResourceNotFoundException;
 import com.cart.cartcraft.model.Cart;
+import com.cart.cartcraft.model.User;
 import com.cart.cartcraft.repository.CartItemRepository;
 import com.cart.cartcraft.repository.CartRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +35,7 @@ public class CartService implements ICartService{
         cartItemRepository.deleteAllByCartId(id);
         cart.getItems().clear();
         cartRepository.deleteById(id);
-
+        cart.setTotalAmount(BigDecimal.ZERO);
     }
 
     @Override
@@ -43,13 +45,18 @@ public class CartService implements ICartService{
     }
 
     @Override
-    public Long initializeNewCart() {
-        Cart newCart = new Cart();
-        Cart savedCart = cartRepository.save(newCart);
-        if (savedCart.getId() == null) {
-            throw new ResourceNotFoundException("Failed to initialize a new cart");
-        }
-        return savedCart.getId();
+    public Cart initializeNewCart(User user) {
+        return Optional.ofNullable(getCartByUserId(user.getId()))
+                .orElseGet(() -> {
+                    Cart newCart = new Cart();
+                    newCart.setUser(user);
+                    return cartRepository.save(newCart);
+                });
+    }
+
+    @Override
+    public Cart getCartByUserId(Long userId) {
+        return cartRepository.findByUserId(userId);
     }
 
 }
